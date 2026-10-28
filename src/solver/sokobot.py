@@ -6,9 +6,9 @@ DR = (-1, 1, 0, 0)
 DC = (0, 0, -1, 1)
 CH = ("u", "d", "l", "r")
 
-# Weighted A*: f = g + WEIGHT * h. 1.0 gives shortest solutions; a bit higher
+# Weighted A*
 WEIGHT = 5
-TIME_LIMIT = 13.0  # seconds; (for testing) the program refuses solutions after 15s
+TIME_LIMIT = 13
 INF = 10 ** 9
 
 
@@ -53,15 +53,15 @@ class SokoBot:
         # a - d = b - 2d. Walls only; other boxes are ignored (lower bound).
         def pull_neighbours(b):
             for d in range(4):
-                a = nbr[opp[d]][b]          # b - d
+                a = nbr[opp[d]][b]
                 if a < 0:
                     continue
-                p = nbr[opp[d]][a]          # b - 2d
+                p = nbr[opp[d]][a]
                 if p < 0:
                     continue
                 yield a
 
-        push_dist = [INF] * N               # min pushes to ANY goal
+        push_dist = [INF] * N
         q = deque()
         for g in goals:
             push_dist[g] = 0
@@ -80,10 +80,10 @@ class SokoBot:
                 total += push_dist[b]
             return total
 
-        # freeze deadlock: is the box at pos permanently stuck?
+        # freeze deadlock detection
         def frozen(pos, boxset, seen):
             if pos in seen:
-                return True                  # circular wait counts as blocked
+                return True
             seen = seen | {pos}
             # horizontal axis
             left, right = nbr[2][pos], nbr[3][pos]
@@ -123,9 +123,9 @@ class SokoBot:
         if not goals or all(goal[b] for b in start_boxes):
             return ""
 
-        # S E A R C H
+        # search
         # heap entry: (f, counter, g, player, boxes, parent_node)
-        # parent_node is (previous_node, move_string) so the path can be rebuilt.
+        # parent_node is (previous_node, move_string)
         counter = 0
         h0 = heuristic(start_boxes)
         heap = [(WEIGHT * h0, 0, 0, player0, start_boxes, None)]
@@ -151,7 +151,7 @@ class SokoBot:
                         came_dir[n] = d
                         dq.append(n)
 
-            # same boxes + same reachable region = same state, whatever the player's cell
+            # same boxes + same reachable region = same state
             key = (min(came), boxes)
             if key in closed:
                 continue
